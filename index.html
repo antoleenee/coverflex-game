@@ -343,7 +343,7 @@ const CONFIG={
   ctaUrl:'https://www.coverflex.com/it/?utm_source=taxi&utm_medium=qr&utm_campaign=evento_milano_nov26&utm_content=game',
   // link al gioco usato nelle condivisioni (di default: questa pagina, con UTM "share")
   shareUrl:location.origin+location.pathname+'?utm_source=share&utm_medium=social&utm_campaign=evento_milano_nov26',
-  shareText:n=>`Ho fatto ${n} punti al gioco delle scartoffie, riesci a battermi?`,
+  shareText:n=>`Ho fatto ${n} punti fuggendo dalle scartoffie con Coverflex, riesci a battermi?`,
   invulnSeconds:6,
   lives:3,
 };
@@ -460,7 +460,7 @@ function zone(e,m){const r=rect(e);let x=r.x-m,w=r.w+2*m;if(e.type==='postit'){x
 function blocked(o,m=6,onlyObs=false){for(const e of S.ents){if(e.gone||e.flying||e.type==='sheet')continue;if(onlyObs&&e.kind!=='obs')continue;if(overlap(zone(e,m),zone(o,0)))return e}return null}
 function addEnt(o){S.ents.push(o);return o}
 // colloca un oggetto spostandolo in avanti finché non trova spazio libero
-function placeFree(o,m=6){let guard=0,e;while((e=blocked(o,m))&&guard++<20){const z=zone(e,m);o.x=z.x+z.w+1-(o.type==='postit'?0:0)}return addEnt(o)}
+function placeFree(o,m=6){let guard=0,e;while((e=blocked(o,m))&&guard++<20){const z=zone(e,m);o.x=z.x+z.w+1+(o.x-zone(o,0).x)}return addEnt(o)}
 function coinArc(cx,n,peak){for(let i=0;i<n;i++){const t=(i/(n-1))*2-1;const c={kind:'coin',x:cx+t*30-4,y:GROUND-12-peak*(1-t*t),w:8,h:8};if(!blocked(c,4))addEnt(c)}}
 function coinRow(x0,n,y){for(let i=0;i<n;i++){const c={kind:'coin',x:x0+i*12,y,w:8,h:8};if(!blocked(c,4))addEnt(c)}}
 function spawnObstacle(){
@@ -515,8 +515,8 @@ function update(dt){
     if(e.flying){e.x+=e.vx;e.y+=e.vy;e.vy+=.25;e.rot=(e.rot||0)+.3;continue}
     e.x-=sp+(e.vx?-e.vx:0);
     if(e.type==='postit'){e.ph+=.08;e.y=e.base+Math.sin(e.ph)*3}
-    if(e.type==='printer'&&!S.dead){e.cd--;if(e.cd<=0&&e.x<W&&e.x>S.x+20){e.cd=55;addEnt({kind:'obs',type:'sheet',x:e.x+8,y:e.y-4,w:6,h:6,hb:[0,0,6,6],svx:-.9,svy:-3.2})}}
-    if(e.type==='sheet'){e.x+=e.svx;e.y+=e.svy;e.svy+=.12;if(e.y>GROUND-6){e.y=GROUND-6;e.svy=0;e.svx=0;e.land=(e.land||0)+1;if(e.land>40)e.gone=true}}
+    if(e.type==='printer'&&!S.dead){e.cd--;if(e.cd<=0&&e.x<W&&e.x>S.x+20){e.cd=95;addEnt({kind:'obs',type:'sheet',x:e.x+8,y:e.y-4,w:6,h:6,hb:[0,0,6,6],svx:-.9,svy:-3.2})}}
+    if(e.type==='sheet'){e.x+=e.svx;e.y+=e.svy;e.svy+=.12;if(e.y>GROUND-8){e.gone=true;burst(e.x+3,GROUND-4,['#FFFFFF','#CDD4DC'],4)}}
     if(e.kind!=='obs'){e.bob=(e.bob||0)+.1}
     if(S.dead||e.gone)continue;
     const r=rect(e),hit=overlap(pr,e.kind==='obs'?r:{x:r.x-1,y:r.y-1+(e.kind!=='coin'?Math.sin(e.bob)*2:0),w:r.w+2,h:r.h+2});
